@@ -2,13 +2,47 @@ const userModel = require("../models/userModel");
 const blogModel = require("../models/blogModel");
 const fs = require("fs");
 
+// All blogs
+const everyBlog = async (req, res) => {
+  const { page = 1, limit = 9 } = req.query;
+  const skip = (parseInt(page) - 1) * limit;
+  const totalBlog = blogModel.length;
+  try {
+    const blogs = await blogModel
+      .find()
+      .sort({ timestamps: -1 })
+      .skip(skip)
+      .limit(parseInt(limit));
+    if (!blogs) {
+      res.status(404).json({
+        status: "Failed",
+        message: "Couldn't find a blog",
+      });
+    }
+    const count = await blogModel.countDocuments();
+    res.status(200).json({
+      status: "OK",
+      data: blogs,
+      totalBlog,
+      page,
+      limit,
+      count,
+      totalPages: Math.ceil(count / limit),
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: err.message,
+    });
+  }
+};
+
 // get all blogs of a specific user
 const allBlog = async (req, res) => {
   try {
     if (!req.user) {
       return res.status(401).json({ message: "Unauthorized request." });
     }
-    // get blog by label
+
     // get all blog
     const blogs = await blogModel.find({ author: req.userId });
     if (!blogs) {
@@ -105,7 +139,6 @@ const createBlog = async (req, res) => {
 
 // update a blog
 const updateBlog = async (req, res) => {
-
   const blogs = await blogModel.find({ author: req.userId });
   // console.log(blogs);
 
@@ -171,7 +204,7 @@ const deleteBlog = async (req, res) => {
   }
 };
 
-// middleware fto get a specific blog post by ID
+// middleware to get a specific blog post by ID
 const getBlog = async (req, res, next) => {
   try {
     const blog = await blogModel.findById(req.params.id);
@@ -196,7 +229,9 @@ const getBlog = async (req, res, next) => {
   }
 };
 
+
 module.exports = {
+  everyBlog,
   allBlog,
   allBlogByLabel,
   singleBlog,

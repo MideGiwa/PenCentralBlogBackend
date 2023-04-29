@@ -98,6 +98,7 @@ const generateToken = (user) => {
       username: user.username,
       email: user.email,
       role: user.role,
+      avatar: user.avatar,
     },
     process.env.JWT_SECRET_KEY,
     { expiresIn: "2h" }
@@ -117,6 +118,7 @@ const getUsers = async (req, res) => {
     res.status(200).json({
       status: "OK",
       data: users,
+      numberOfUsers: users.length,
     });
   } catch (error) {
     res.status(404).json({

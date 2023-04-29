@@ -37,12 +37,12 @@ const adminMiddleware = (req, res, next) => {
       .status(403)
       .json({ message: "Unauthorized, meet your superadmin" });
   }
-  // if (req.userRole !== "admin") {
-  //   return res
-  //     .status(403)
-  //     .json({ message: "Unauthorized, see the admin" });
-  // }
-  // next();
+  if (req.userRole !== "admin") {
+    return res
+      .status(403)
+      .json({ message: "Unauthorized, see the admin" });
+  }
+  next();
 };
 
 module.exports = {

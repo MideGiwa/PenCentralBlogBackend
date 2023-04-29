@@ -27,7 +27,7 @@ const blogSchema = mongoose.Schema({
     ref: "User",
     required: true,
   },
-});
+}, {timestamps: true});
 
 const blogModel = mongoose.model("Blog", blogSchema);
 module.exports = blogModel;
