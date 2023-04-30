@@ -100,6 +100,41 @@ const allBlogByLabel = async (req, res) => {
   }
 };
 
+// get all blogs of a specific user by label
+const allVisitorsBlogByLabel = async (req, res) => {
+  try {
+    const blogs = await blogModel.find();
+    if (!blogs) {
+      res.status(404).json({
+        status: "Failed",
+        message: "Couldn't find a blog",
+      });
+    }
+    // get blog by category
+    let label = req.query.label;
+    label = label.toLowerCase();
+    if (label) {
+      const filteredPosts = blogs.filter((post) => post.label === label);
+
+      res.status(200).json({
+        status: "OK",
+        data: filteredPosts,
+      });
+    } else {
+      res.status(404).json({
+        status: "Failed",
+        message: "No blog with such label.",
+      });
+    }
+    console.log(blog);
+    console.log(label);
+  } catch (err) {
+    res.status(500).json({
+      message: err.message,
+    });
+  }
+};
+
 // get a specific blog post
 const singleBlog = async (req, res) => {
   const oneBlog = await blogModel.findById(req.params.id);
@@ -229,11 +264,11 @@ const getBlog = async (req, res, next) => {
   }
 };
 
-
 module.exports = {
   everyBlog,
   allBlog,
   allBlogByLabel,
+  allVisitorsBlogByLabel,
   singleBlog,
   createBlog,
   updateBlog,

@@ -3,6 +3,7 @@ const router = express.Router();
 const {
   allBlog,
   allBlogByLabel,
+  allVisitorsBlogByLabel,
   singleBlog,
   createBlog,
   updateBlog,
@@ -18,8 +19,11 @@ const upload = require("../utils/multer");
 // GET / all blog posts of all roles ( i.e, superadmin admin and user)
 router.get("/blogs", everyBlog);
 
-// GET /a blog post by all roles
+// GET / a blog post by all roles
 router.get("/visitors/blogs/:id", singleBlog);
+
+// GET / all blog post by label of all role
+router.get("/visitors/blogs/label", allVisitorsBlogByLabel);
 
 
 // GET / all blog post of a specific user
