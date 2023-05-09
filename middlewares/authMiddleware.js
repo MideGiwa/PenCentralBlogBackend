@@ -8,6 +8,7 @@ const authMiddleware = (req, res, next) => {
     });
   }
   const token = authHeader.split(" ")[1];
+  // const token = authHeader;
   try {
     const decodedToken = jwt.verify(token, process.env.JWT_SECRET_KEY);
     // get the payload from the decoded token
@@ -32,17 +33,14 @@ const superAdminMiddleware = (req, res, next) => {
 };
 
 const adminMiddleware = (req, res, next) => {
-  if (req.userRole !== "admin" && req.userRole !== "superadmin") {
+  // console.log(req.userRole);
+  if (req.userRole === "admin" || req.userRole === "superadmin") {
+    next();
+  } else {
     return res
       .status(403)
       .json({ message: "Unauthorized, meet your superadmin" });
   }
-  if (req.userRole !== "admin") {
-    return res
-      .status(403)
-      .json({ message: "Unauthorized, see the admin" });
-  }
-  next();
 };
 
 module.exports = {

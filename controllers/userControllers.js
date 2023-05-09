@@ -8,6 +8,9 @@ const blacklist = [];
 // sign up user
 const signUp = async (req, res, next) => {
   try {
+    // if (req.userRole !== "superadmin") {
+    //   return res.status(401).json({ message: "Unauthorized request." });
+    // }
     const { username, email, password, role } = req.body;
     const checkUser = await userModel.findOne({ email });
     if (checkUser) {
@@ -106,10 +109,13 @@ const generateToken = (user) => {
   return token;
 };
 
-// show all users
+// show all users except the superuser
 const getUsers = async (req, res) => {
   try {
-    const users = await userModel.find().populate("blogs");
+    const users = await userModel
+      // .find();
+      .find({ role: { $in: ["admin", "user"] } })
+      .populate("blogs");
     if (users.length < 1) {
       res.status(404).json({
         message: "No users found",
@@ -154,17 +160,19 @@ const updateUser = async (req, res) => {
   try {
     const { username, email, password, role } = req.body;
     const userId = req.params.userId;
-    const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    saltRounds = 10;
+    const salt = await bcrypt.genSalt(saltRounds);
+    const hashedPassword = await bcrypt.hash(password, salt);
     const updatedRaw = {
       username,
       email,
       password: hashedPassword,
       role,
     };
-    await userModel.findByIdAndUpdate(userId, updatedRaw, {
+    const updatedUser = await userModel.findByIdAndUpdate(userId, updatedRaw, {
       new: true,
     });
+    // console.log(updatedUser);
     res.status(200).json({
       message: "Updated successfully",
     });

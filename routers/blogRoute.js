@@ -8,16 +8,18 @@ const {
   createBlog,
   updateBlog,
   deleteBlog,
+  deleteVisitorsBlog,
   everyBlog,
 } = require("../controllers/blogController");
 const {
   authMiddleware,
+  // superAdminMiddleware,
   adminMiddleware,
 } = require("../middlewares/authMiddleware");
 const upload = require("../utils/multer");
 
 // GET / all blog posts of all roles ( i.e, superadmin admin and user)
-router.get("/blogs", everyBlog);
+router.get("/visitors/blogs", everyBlog);
 
 // GET / a blog post by all roles
 router.get("/visitors/blogs/:id", singleBlog);
@@ -25,23 +27,42 @@ router.get("/visitors/blogs/:id", singleBlog);
 // GET / all blog post by label of all role
 router.get("/visitors/blogs/label", allVisitorsBlogByLabel);
 
+// DELETE / a blog of all role
+router.delete("/visitors/blogs/:id", deleteVisitorsBlog);
 
 // GET / all blog post of a specific user
 router.get("/blogs/user", authMiddleware, adminMiddleware, allBlog);
 
-// GET / all blog post by label of an admin
-router.get("/blogs/label", authMiddleware, adminMiddleware, allBlogByLabel);
-
 // POST /create a blog post by an admin
-router.post("/blogs", authMiddleware, adminMiddleware, upload, createBlog);
+router.post(
+  "/admin/blogs",
+  authMiddleware,
+  adminMiddleware,
+  upload,
+  createBlog
+);
+
+// GET / all blog post by label of an admin
+router.get(
+  "admin/blogs/label",
+  authMiddleware,
+  adminMiddleware,
+  allBlogByLabel
+);
 
 // GET /a blog post by an admin
 router.get("/admin/blogs/:id", authMiddleware, adminMiddleware, singleBlog);
 
 // PATCH /update a blog post by an admin
-router.patch("/blogs/:id", authMiddleware, adminMiddleware, upload, updateBlog);
+router.patch(
+  "/admin/blogs/:id",
+  authMiddleware,
+  adminMiddleware,
+  upload,
+  updateBlog
+);
 
 // DELETE /delete a blog post by an admin
-router.delete("/blogs/:id", authMiddleware, adminMiddleware, deleteBlog);
+router.delete("/admin/blogs/:id", authMiddleware, adminMiddleware, deleteBlog);
 
 module.exports = router;

@@ -126,8 +126,8 @@ const allVisitorsBlogByLabel = async (req, res) => {
         message: "No blog with such label.",
       });
     }
-    console.log(blog);
-    console.log(label);
+    // console.log(blog);
+    // console.log(label);
   } catch (err) {
     res.status(500).json({
       message: err.message,
@@ -227,7 +227,33 @@ const deleteBlog = async (req, res) => {
     // remove the blog post
     await fs.unlinkSync(blog.captionImage);
     await blog.remove();
-    console.log(blog);
+    // console.log(blog);
+    res.status(200).json({
+      status: "Ok",
+      message: "Blog post deleted successfully",
+    });
+  } catch (err) {
+    res.status(400).json({
+      message: err.message,
+    });
+  }
+};
+
+// delete a blog post
+const deleteVisitorsBlog = async (req, res) => {
+  try {
+    // const blog = await getBlog();
+    const blog = await blogModel.findById(req.params.id);
+    if (blog == null) {
+      return res.status(404).json({
+        message: "Blog post not found.",
+      });
+    }
+
+    // remove the blog post
+    await fs.unlinkSync(blog.captionImage);
+    await blog.remove();
+    // console.log(blog);
     res.status(200).json({
       status: "Ok",
       message: "Blog post deleted successfully",
@@ -273,4 +299,5 @@ module.exports = {
   createBlog,
   updateBlog,
   deleteBlog,
+  deleteVisitorsBlog,
 };
