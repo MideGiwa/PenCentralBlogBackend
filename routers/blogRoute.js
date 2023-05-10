@@ -31,7 +31,7 @@ router.get("/visitors/blogs/label", allVisitorsBlogByLabel);
 router.delete("/visitors/blogs/:id", deleteVisitorsBlog);
 
 // GET / all blog post of a specific user
-router.get("/blogs/user", authMiddleware, adminMiddleware, allBlog);
+router.get("/admin/blogs", authMiddleware, adminMiddleware, allBlog);
 
 // POST /create a blog post by an admin
 router.post(

@@ -50,11 +50,12 @@ const allBlog = async (req, res) => {
         status: "Failed",
         message: "Couldn't find a blog",
       });
+    } else {
+      res.status(200).json({
+        status: "OK",
+        data: blogs,
+      });
     }
-    res.status(200).json({
-      status: "OK",
-      data: blogs,
-    });
   } catch (err) {
     res.status(500).json({
       message: err.message,
@@ -176,11 +177,15 @@ const createBlog = async (req, res) => {
 const updateBlog = async (req, res) => {
   const blogs = await blogModel.find({ author: req.userId });
   // console.log(blogs);
+  // console.log(blogs[0].captionImage);
+  
 
   // check for existing file
-  if (req.file) {
-    await fs.unlinkSync(blogs[0].captionImage);
-  }
+  // if (req.file) {
+  //   await fs.unlinkSync(blogs[0].captionImage);
+  // }else{
+  //   console.log("no such file")
+  // }
 
   try {
     const raw = {
@@ -195,8 +200,6 @@ const updateBlog = async (req, res) => {
     const updatedBlog = await blogModel.findByIdAndUpdate(blogs, raw, {
       new: true,
     });
-
-    // console.log(updatedBlog);
 
     res.status(200).json({
       status: "OK",
