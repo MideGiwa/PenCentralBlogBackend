@@ -115,7 +115,8 @@ const getUsers = async (req, res) => {
     const users = await userModel
       // .find();
       .find({ role: { $in: ["admin", "user"] } })
-      .populate("blogs");
+      .populate("blogs")
+      .populate("events");
     if (users.length < 1) {
       res.status(404).json({
         message: "No users found",

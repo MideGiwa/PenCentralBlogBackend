@@ -24,6 +24,6 @@ const upload = multer({
   fileSize: {
     limits: 1024 * 1024 * 10, // allows only image with less than or 10MB to be uploaded.
   },
-}).single("captionImage");
+});
 
 module.exports = upload;

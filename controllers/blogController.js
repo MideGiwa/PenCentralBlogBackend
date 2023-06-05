@@ -13,22 +13,23 @@ const everyBlog = async (req, res) => {
       .sort({ timestamps: -1 })
       .skip(skip)
       .limit(parseInt(limit));
-    if (!blogs) {
+    if (!totalBlog) {
       res.status(404).json({
         status: "Failed",
-        message: "Couldn't find a blog",
+        message: "Couldn't find any blog",
+      });
+    } else {
+      const count = await blogModel.countDocuments();
+      res.status(200).json({
+        status: "OK",
+        data: blogs,
+        totalBlog,
+        page,
+        limit,
+        count,
+        totalPages: Math.ceil(count / limit),
       });
     }
-    const count = await blogModel.countDocuments();
-    res.status(200).json({
-      status: "OK",
-      data: blogs,
-      totalBlog,
-      page,
-      limit,
-      count,
-      totalPages: Math.ceil(count / limit),
-    });
   } catch (err) {
     res.status(500).json({
       message: err.message,
@@ -48,7 +49,7 @@ const allBlog = async (req, res) => {
     if (!blogs) {
       res.status(404).json({
         status: "Failed",
-        message: "Couldn't find a blog",
+        message: "Couldn't find any blog",
       });
     } else {
       res.status(200).json({
@@ -72,15 +73,16 @@ const allBlogByLabel = async (req, res) => {
     // get blog by label
     // get all blog
     const blogs = await blogModel.find({ author: req.userId });
-    if (!blogs) {
+    if (blogs.length <= 0) {
       res.status(404).json({
         status: "Failed",
-        message: "Couldn't find a blog",
+        message: "Couldn't find any blog",
       });
     }
     // get blog by category
     let label = req.query.label;
     label = label.toLowerCase();
+    console.log(label);
     if (label) {
       const filteredPosts = blogs.filter((post) => post.label === label);
 
@@ -94,6 +96,8 @@ const allBlogByLabel = async (req, res) => {
         message: "No blog with such label.",
       });
     }
+    console.log(blog);
+    console.log(label);
   } catch (err) {
     res.status(500).json({
       message: err.message,
@@ -101,11 +105,11 @@ const allBlogByLabel = async (req, res) => {
   }
 };
 
-// get all blogs of a specific user by label
+// get all blogs by label
 const allVisitorsBlogByLabel = async (req, res) => {
   try {
     const blogs = await blogModel.find();
-    if (!blogs) {
+    if (blogs.length <= 0) {
       res.status(404).json({
         status: "Failed",
         message: "Couldn't find a blog",
@@ -127,7 +131,7 @@ const allVisitorsBlogByLabel = async (req, res) => {
         message: "No blog with such label.",
       });
     }
-    // console.log(blog);
+    // console.log(blogs);
     // console.log(label);
   } catch (err) {
     res.status(500).json({
@@ -167,7 +171,7 @@ const createBlog = async (req, res) => {
       data: newBlog,
     });
   } catch (err) {
-    res.status(400).json({
+    res.status(500).json({
       message: err.message,
     });
   }
@@ -178,7 +182,6 @@ const updateBlog = async (req, res) => {
   const blogs = await blogModel.find({ author: req.userId });
   // console.log(blogs);
   // console.log(blogs[0].captionImage);
-  
 
   // check for existing file
   // if (req.file) {
@@ -211,7 +214,7 @@ const updateBlog = async (req, res) => {
   }
 };
 
-// delete a blog post
+// delete a blog post of a specific user
 const deleteBlog = async (req, res) => {
   try {
     // const blog = await getBlog();
@@ -242,7 +245,7 @@ const deleteBlog = async (req, res) => {
   }
 };
 
-// delete a blog post
+// delete a blog post of visitors
 const deleteVisitorsBlog = async (req, res) => {
   try {
     // const blog = await getBlog();

@@ -38,13 +38,13 @@ router.post(
   "/admin/blogs",
   authMiddleware,
   adminMiddleware,
-  upload,
+  upload.single("captionImage"),
   createBlog
 );
 
 // GET / all blog post by label of an admin
 router.get(
-  "admin/blogs/label",
+  "/admin/blogs",
   authMiddleware,
   adminMiddleware,
   allBlogByLabel
@@ -54,11 +54,11 @@ router.get(
 router.get("/admin/blogs/:id", authMiddleware, adminMiddleware, singleBlog);
 
 // PATCH /update a blog post by an admin
-router.patch(
+router.put(
   "/admin/blogs/:id",
   authMiddleware,
   adminMiddleware,
-  upload,
+  upload.single("captionImage"),
   updateBlog
 );
 

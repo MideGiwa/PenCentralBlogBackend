@@ -4,6 +4,7 @@ const express = require("express");
 const cors = require("cors");
 const userRoute = require("../routers/userRoute");
 const blogRoute = require("../routers/blogRoute");
+const eventRoute = require("../routers/eventRoute");
 
 const app = express();
 
@@ -19,5 +20,6 @@ app.get("/api/v1", (req, res) => {
 
 app.use("/api/v1", userRoute);
 app.use("/api/v1", blogRoute);
+app.use("/api/v1", eventRoute);
 
 module.exports = app;
