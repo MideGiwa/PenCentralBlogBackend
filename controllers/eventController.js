@@ -45,7 +45,10 @@ const allEvents = async (req, res) => {
     }
 
     // get all event
-    const events = await eventModel.find({ author: req.userId });
+    const events = await eventModel
+      .find({ author: req.userId })
+    //   .sort({ timestamps: -1 });
+      .sort({ createdAt: -1 });
     if (events.length <= 0) {
       res.status(404).json({
         status: "Failed",
@@ -302,7 +305,10 @@ const deleteVisitorsEvent = async (req, res) => {
 
 // update a event
 const updateEvent = async (req, res) => {
-  const eventId = await eventModel.find({ author: req.userId });
+  //   const event = await eventModel.find({ author: req.userId });
+  //   console.log(event);
+  const eventId = await eventModel.findById(req.params.id);
+//   console.log(eventId);
 
   try {
     const { eventTitle, eventContent } = req.body;

@@ -179,7 +179,8 @@ const createBlog = async (req, res) => {
 
 // update a blog
 const updateBlog = async (req, res) => {
-  const blogs = await blogModel.find({ author: req.userId });
+  // const blogs = await blogModel.find({ author: req.userId });
+  const blogId = await blogModel.find(req.params.id);
   // console.log(blogs);
   // console.log(blogs[0].captionImage);
 
@@ -200,7 +201,7 @@ const updateBlog = async (req, res) => {
       captionImage: req.file.path,
     };
 
-    const updatedBlog = await blogModel.findByIdAndUpdate(blogs, raw, {
+    const updatedBlog = await blogModel.findByIdAndUpdate(blogId, raw, {
       new: true,
     });
 
