@@ -65,7 +65,7 @@ router.get(
   singleUserEvent
 );
 
-// PATCH /update a event post by an admin
+// PUT /update a event post by an admin
 router.put(
   "/admin/events/:id",
   authMiddleware,

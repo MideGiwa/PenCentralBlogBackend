@@ -313,8 +313,8 @@ const updateEvent = async (req, res) => {
   try {
     const { eventTitle, eventContent } = req.body;
     const updateFields = {
-      eventTitle,
-      eventContent,
+      eventTitle: eventTitle|| eventId.eventTitle,
+      eventContent: eventContent|| eventId.eventContent,
     };
 
     // Check if titleImage is being updated

@@ -180,13 +180,13 @@ const createBlog = async (req, res) => {
 // update a blog
 const updateBlog = async (req, res) => {
   // const blogs = await blogModel.find({ author: req.userId });
-  const blogId = await blogModel.find(req.params.id);
+  const blogId = await blogModel.findById(req.params.id);
   // console.log(blogs);
   // console.log(blogs[0].captionImage);
 
   // check for existing file
   // if (req.file) {
-  //   await fs.unlinkSync(blogs[0].captionImage);
+  //   await fs.unlinkSync(blogId[0].captionImage);
   // }else{
   //   console.log("no such file")
   // }
