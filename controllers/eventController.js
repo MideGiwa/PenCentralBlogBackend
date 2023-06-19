@@ -10,7 +10,7 @@ const everyEvent = async (req, res) => {
   try {
     const events = await eventModel
       .find()
-      .sort({ timestamps: -1 })
+    //   .sort({ timestamps: -1 })
       .skip(skip)
       .limit(parseInt(limit));
     if (!totalEvent) {
@@ -47,9 +47,7 @@ const allEvents = async (req, res) => {
     // get all event
     const events = await eventModel
       .find({ author: req.userId })
-    //   .sort({ timestamps: -1 });
-      .sort({ createdAt: -1 });
-    if (events.length <= 0) {
+    if (!events) {
       res.status(404).json({
         status: "Failed",
         message: "Couldn't find any event",
@@ -108,23 +106,6 @@ const allEventByEventTitle = async (req, res) => {
       status: "OK",
       data: filteredEvents,
     });
-
-    //     const event = await eventModel.findOne({
-    //       author: req.userId,
-    //       eventTitle: { $regex: new RegExp(title, "i") },
-    //     });
-
-    //     if (!event) {
-    //       return res.status(404).json({
-    //         status: "Failed",
-    //         message: "No event with such eventTitle.",
-    //       });
-    //     }
-
-    //     res.status(200).json({
-    //       status: "OK",
-    //       data: event,
-    //     });
   } catch (err) {
     res.status(500).json({
       message: err.message,
@@ -160,8 +141,6 @@ const allVisitorsEventByEventTitle = async (req, res) => {
         message: "No blog with such eventTitle.",
       });
     }
-    // console.log(event);
-    // console.log(eventTitle);
   } catch (err) {
     res.status(500).json({
       message: err.message,
@@ -172,10 +151,16 @@ const allVisitorsEventByEventTitle = async (req, res) => {
 // get a specific event post
 const singleEvent = async (req, res) => {
   const oneEvent = await eventModel.findById(req.params.id);
-  res.status(200).json({
-    status: "OK",
-    data: oneEvent,
-  });
+  if (!oneEvent) {
+    res.status(404).json({
+      message: "No event found",
+    });
+  } else {
+    res.status(200).json({
+      status: "OK",
+      data: oneEvent,
+    });
+  }
 };
 
 // get a specific event post
@@ -241,9 +226,10 @@ const deleteEvent = async (req, res) => {
       });
     }
 
-    // Delete event images from the upload folder
+    // get all the images from the two fields to a single array using the spread operator
     const imageFilenames = [...event.eventImages, event.titleImage];
 
+    // Delete event images from the upload folder
     imageFilenames.forEach((filename) => {
       fs.unlink(`uploads/${filename}`, (err) => {
         if (err) {
@@ -291,7 +277,6 @@ const deleteVisitorsEvent = async (req, res) => {
 
     // Delete the document from the database
     await eventModel.findByIdAndDelete(eventId);
-
     res.status(200).json({
       status: "OK",
       message: "Event deleted",
@@ -308,22 +293,33 @@ const updateEvent = async (req, res) => {
   //   const event = await eventModel.find({ author: req.userId });
   //   console.log(event);
   const eventId = await eventModel.findById(req.params.id);
-//   console.log(eventId);
 
   try {
     const { eventTitle, eventContent } = req.body;
     const updateFields = {
-      eventTitle: eventTitle|| eventId.eventTitle,
-      eventContent: eventContent|| eventId.eventContent,
+      eventTitle: eventTitle || eventId.eventTitle,
+      eventContent: eventContent || eventId.eventContent,
+      titleImage: eventId.titleImage,
+      eventImages: eventId.eventImages,
     };
 
     // Check if titleImage is being updated
     if (req.files["titleImage"]) {
+      //   track the image file
+      const oldTitleImagePath = `uploads/${eventId.titleImage}`;
+      if (fs.existsSync(oldTitleImagePath)) {
+        fs.unlinkSync(oldTitleImagePath);
+      }
       updateFields.titleImage = req.files["titleImage"][0].filename;
     }
 
     // Check if eventImages are being updated
     if (req.files["eventImages"]) {
+      //   track the image file
+      const oldEventImagesPath = `uploads/${eventId.eventImages}`;
+      if (fs.existsSync(oldEventImagesPath)) {
+        fs.unlinkSync(oldEventImagesPath);
+      }
       updateFields.eventImages = req.files["eventImages"].map(
         (file) => file.filename
       );

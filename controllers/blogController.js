@@ -10,7 +10,7 @@ const everyBlog = async (req, res) => {
   try {
     const blogs = await blogModel
       .find()
-      .sort({ timestamps: -1 })
+      // .sort({ timestamps: -1 })
       .skip(skip)
       .limit(parseInt(limit));
     if (!totalBlog) {
@@ -131,8 +131,6 @@ const allVisitorsBlogByLabel = async (req, res) => {
         message: "No blog with such label.",
       });
     }
-    // console.log(blogs);
-    // console.log(label);
   } catch (err) {
     res.status(500).json({
       message: err.message,
@@ -143,21 +141,28 @@ const allVisitorsBlogByLabel = async (req, res) => {
 // get a specific blog post
 const singleBlog = async (req, res) => {
   const oneBlog = await blogModel.findById(req.params.id);
-  res.status(200).json({
-    status: "OK",
-    data: oneBlog,
-  });
+  if (!oneBlog) {
+    res.status(404).json({
+      message: "Couldn't find blog",
+    });
+  } else {
+    res.status(200).json({
+      status: "OK",
+      data: oneBlog,
+    });
+  }
 };
 
 // post a blog
 const createBlog = async (req, res) => {
+  const { label, title, description, content } = req.body;
   const blog = new blogModel({
-    label: req.body.label,
-    title: req.body.title,
-    description: req.body.description,
-    content: req.body.content,
+    label,
+    title,
+    description,
+    content,
     author: req.userId,
-    captionImage: req.file.path,
+    captionImage: req.files.captionImage[0].filename,
   });
 
   try {
@@ -165,7 +170,7 @@ const createBlog = async (req, res) => {
     const user = await userModel.findById(req.userId);
     user.blogs.push(newBlog);
     await user.save();
-    res.status(200).json({
+    res.status(201).json({
       status: "OK",
       message: "Your blog has been created.",
       data: newBlog,
@@ -181,27 +186,28 @@ const createBlog = async (req, res) => {
 const updateBlog = async (req, res) => {
   // const blogs = await blogModel.find({ author: req.userId });
   const blogId = await blogModel.findById(req.params.id);
-  // console.log(blogs);
-  // console.log(blogs[0].captionImage);
-
-  // check for existing file
-  // if (req.file) {
-  //   await fs.unlinkSync(blogId[0].captionImage);
-  // }else{
-  //   console.log("no such file")
-  // }
-
   try {
-    const raw = {
-      label: req.body.label,
-      title: req.body.title,
-      description: req.body.description,
-      content: req.body.content,
+    const { label, title, description, content } = req.body;
+    const bodyData = {
+      label: label || blogId.label,
+      title: title || blogId.title,
+      description: description || blogId.description,
+      content: content || blogId.content,
       author: req.userId,
-      captionImage: req.file.path,
+      captionImage: blogId.captionImage,
     };
 
-    const updatedBlog = await blogModel.findByIdAndUpdate(blogId, raw, {
+    // Check if eventImages are being updated
+    if (req.files["captionImage"]) {
+      //   track the image file
+      const oldCaptionImagesPath = `uploads/${blogId.captionImage}`;
+      if (fs.existsSync(oldCaptionImagesPath)) {
+        fs.unlinkSync(oldCaptionImagesPath);
+      }
+      bodyData.captionImage = req.files["captionImage"][0].filename;
+    }
+
+    const updatedBlog = await blogModel.findByIdAndUpdate(blogId, bodyData, {
       new: true,
     });
 
@@ -217,10 +223,10 @@ const updateBlog = async (req, res) => {
 
 // delete a blog post of a specific user
 const deleteBlog = async (req, res) => {
+  const blogId = req.params.id;
   try {
-    // const blog = await getBlog();
-    const blog = await blogModel.findById(req.params.id);
-    if (blog == null) {
+    const blog = await blogModel.findById(blogId);
+    if (!blog) {
       return res.status(404).json({
         message: "Blog post not found.",
       });
@@ -231,10 +237,12 @@ const deleteBlog = async (req, res) => {
         message: "Unauthorized request.",
       });
     }
-    // remove the blog post
-    await fs.unlinkSync(blog.captionImage);
-    await blog.remove();
-    // console.log(blog);
+
+    const oldCaptionImagePath = `uploads/${blog.captionImage}`;
+    if (fs.existsSync(oldCaptionImagePath)) {
+      fs.unlinkSync(oldCaptionImagePath);
+    }
+    await blogModel.findByIdAndDelete(blogId);
     res.status(200).json({
       status: "Ok",
       message: "Blog post deleted successfully",
@@ -251,47 +259,23 @@ const deleteVisitorsBlog = async (req, res) => {
   try {
     // const blog = await getBlog();
     const blog = await blogModel.findById(req.params.id);
-    if (blog == null) {
+    if (!blog) {
       return res.status(404).json({
         message: "Blog post not found.",
       });
     }
 
-    // remove the blog post
-    await fs.unlinkSync(blog.captionImage);
-    await blog.remove();
-    // console.log(blog);
+    const oldCaptionImagePath = `uploads/${blog.captionImage}`;
+    if (fs.existsSync(oldCaptionImagePath)) {
+      fs.unlinkSync(oldCaptionImagePath);
+    }
+    await blogModel.findByIdAndDelete(blogId);
     res.status(200).json({
       status: "Ok",
       message: "Blog post deleted successfully",
     });
   } catch (err) {
     res.status(400).json({
-      message: err.message,
-    });
-  }
-};
-
-// middleware to get a specific blog post by ID
-const getBlog = async (req, res, next) => {
-  try {
-    const blog = await blogModel.findById(req.params.id);
-    if (blog == null) {
-      return res.status(404).json({
-        message: "Blog post not found.",
-      });
-    }
-
-    if (blog.author.toString() !== req.userId.toString()) {
-      return res.status(401).json({
-        message: "Unauthorized request.",
-      });
-    }
-
-    res.blog = blog;
-    next();
-  } catch (err) {
-    return res.status(500).json({
       message: err.message,
     });
   }

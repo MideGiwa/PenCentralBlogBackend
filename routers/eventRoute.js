@@ -41,14 +41,14 @@ router.post(
   adminMiddleware,
   upload.fields([
     { name: "titleImage", maxCount: 1 },
-    { name: "eventImages", maxCount: 10 },
+    { name: "eventImages", maxCount: 100 },
   ]),
   createEvent
 );
 
 // GET / all event post by eventTitle of an admin
 router.get(
-  "/admin/events",
+  "/admin/events-by-title",
   authMiddleware,
   adminMiddleware,
   allEventByEventTitle

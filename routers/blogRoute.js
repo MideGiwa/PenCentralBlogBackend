@@ -38,13 +38,13 @@ router.post(
   "/admin/blogs",
   authMiddleware,
   adminMiddleware,
-  upload.single("captionImage"),
+  upload.fields([{name: "captionImage", maxCount: 1}]),
   createBlog
 );
 
 // GET / all blog post by label of an admin
 router.get(
-  "/admin/blogs",
+  "/admin/blogs-by-label",
   authMiddleware,
   adminMiddleware,
   allBlogByLabel
@@ -58,7 +58,8 @@ router.put(
   "/admin/blogs/:id",
   authMiddleware,
   adminMiddleware,
-  upload.single("captionImage"),
+  // upload.single("captionImage"),
+  upload.fields([{name: "captionImage", maxCount: 1}]),
   updateBlog
 );
 
