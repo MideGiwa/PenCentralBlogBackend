@@ -238,6 +238,7 @@ const deleteBlog = async (req, res) => {
       });
     }
 
+    // const oldCaptionImagePath = `uploads/${blog.captionImage}`;
     const oldCaptionImagePath = `uploads/${blog.captionImage}`;
     if (fs.existsSync(oldCaptionImagePath)) {
       fs.unlinkSync(oldCaptionImagePath);
