@@ -20,8 +20,9 @@ mongoose.set('strictQuery', false);
 mongoose
   // .connect(url, connectionParams)
   .connect(
-    `mongodb+srv://${db_username}:${db_password}@argon-pay.hptaa.mongodb.net/ChamsWebsiteDB`,
-    connectionParams
+    // `mongodb+srv://${db_username}:${db_password}@argon-pay.hptaa.mongodb.net/pencentralWebsiteDB`,
+    // connectionParams
+    `mongodb+srv://${db_username}:${db_password}@cluster0.tse4bwm.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`
   )
   .then(() => {
     console.log("Connected to the database ");

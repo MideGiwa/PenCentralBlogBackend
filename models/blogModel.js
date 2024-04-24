@@ -5,7 +5,7 @@ const blogSchema = mongoose.Schema(
     label: {
       type: String,
       required: true,
-      lowercase: true,
+      // lowercase: true,
     },
     title: {
       type: String,

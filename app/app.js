@@ -14,7 +14,7 @@ app.use("/uploads", express.static("uploads"));
 
 app.get("/api/v1", (req, res) => {
   res.status(200).json({
-    message: "API for ChamsAccess blog",
+    message: "API for PenCentral blog",
   });
 });
 

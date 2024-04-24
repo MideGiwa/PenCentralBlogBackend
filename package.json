@@ -1,7 +1,7 @@
 {
-  "name": "chamsblogapi",
+  "name": "pencentralblogapi",
   "version": "1.0.0",
-  "description": "This API was created for chamsblog for two reasons: To allow chamsblog admin post blogs and to allow chamsblog users read blog posts.",
+  "description": "This API was created for pencentralblog for two reasons: To allow pencentralblog admin post blogs and to allow pencentralblog users read blog posts.",
   "main": "index.js",
   "scripts": {
     "start": "node server.js",
@@ -9,7 +9,7 @@
   },
   "keywords": [
     "node",
-    "chamsblog",
+    "pencentralblog",
     "express",
     "bcrypt",
     "jwt",
@@ -19,7 +19,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "bcrypt": "^5.1.0",
+    "bcrypt": "^5.1.1",
     "cloudinary": "^1.34.0",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
